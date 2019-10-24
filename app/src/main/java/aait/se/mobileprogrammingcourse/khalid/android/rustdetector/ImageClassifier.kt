@@ -32,9 +32,6 @@ import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.label.FirebaseVisionImageLabel
 import com.google.firebase.ml.vision.label.FirebaseVisionImageLabeler
 import com.google.firebase.ml.vision.label.FirebaseVisionOnDeviceAutoMLImageLabelerOptions
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.Locale
 
@@ -126,7 +123,7 @@ internal constructor(context: Context) {
               " model\n"
       textToShow += "Latency: " + (endTime - startTime).toString() + "ms\n"
       textToShow += if (labelProbList.isNullOrEmpty())
-        "No Result"
+        "Label: norust, Confidence: 1.00"
       else
         printTopKLabels(labelProbList)
 
@@ -173,7 +170,7 @@ internal constructor(context: Context) {
     private const val LOCAL_MODEL_PATH = "rust_detection/manifest.json"
 
     /** Name of the remote model in Firebase ML Kit server.  */
-    private const val REMOTE_MODEL_NAME = "Rust_2019101618530"
+    private const val REMOTE_MODEL_NAME = "Rust_2019101743519"
 
     /** Number of results to show in the UI.  */
     private const val RESULTS_TO_SHOW = 3

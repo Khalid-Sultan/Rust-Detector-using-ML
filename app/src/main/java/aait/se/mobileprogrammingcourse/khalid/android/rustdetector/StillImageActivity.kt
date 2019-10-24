@@ -46,7 +46,6 @@ import java.util.Date
 
 class StillImageActivity : BaseActivity(), LocationListener {
   override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
-
   }
 
   override fun onProviderEnabled(provider: String?) {
@@ -100,9 +99,9 @@ class StillImageActivity : BaseActivity(), LocationListener {
     val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
     val storageDir = cacheDir
     return createTempFile(
-            "JPEG_${timeStamp}_", /* prefix */
-            ".jpg", /* suffix */
-            storageDir /* directory */
+      "JPEG_${timeStamp}_", /* prefix */
+      ".jpg", /* suffix */
+      storageDir /* directory */
     ).apply {
       // Save a file: path for use with ACTION_VIEW intents.
       currentPhotoFile = this
@@ -158,28 +157,17 @@ class StillImageActivity : BaseActivity(), LocationListener {
           Log.d("1", results.toString())
           var finalResult =
             "Source: ${results[1]}" +
-              "Latency: ${results[2].split("No Result")[0]}"
-          if(results[2].contains("No Result")){
-            finalResult += "Result: Could not detect it properly. Try Again."
-          }
-          else {
-            finalResult +=
+              "Latency: ${results[2]}" +
               "Label: ${results[3]}" +
               "Confidence: ${results[4]}"
-          }
+
           textView?.text = finalResult
           val dataService = DataServiceGenerator().createDataService(this)
           getLocation()
 
-
-          if(results[2].contains("No Result")){
-            var rustData= RustData(0.0,0.0,results[1],results[2].split("No Result")[0], "Unknown",0.0f)
-            save(rustData, dataService!!)
-          }
-          else{
-            var rustData= RustData(0.0,0.0,results[1],results[2], results[3],results[4].toFloat())
-            save(rustData, dataService!!)
-          }
+          var rustData =
+            RustData(0.0, 0.0, results[1], results[2], results[3], results[4].toFloat())
+          save(rustData, dataService!!)
         }
       } else {
         val e = task.exception
@@ -228,7 +216,9 @@ class StillImageActivity : BaseActivity(), LocationListener {
 
   private fun clickNextImage() {
     val imageList = bundledImageList
-    if (imageList.isNullOrEmpty()) { return }
+    if (imageList.isNullOrEmpty()) {
+      return
+    }
 
     currentImageIndex = (currentImageIndex + 1) % imageList.size
     classifyBundledImage(currentImageIndex)
@@ -236,7 +226,9 @@ class StillImageActivity : BaseActivity(), LocationListener {
 
   private fun classifyBundledImage(index: Int) {
     val imageList = bundledImageList
-    if (imageList.isNullOrEmpty()) { return }
+    if (imageList.isNullOrEmpty()) {
+      return
+    }
 
     val imageName = imageList[index]
     val drawableId = resources.getIdentifier(imageName, "drawable", packageName)
@@ -246,24 +238,23 @@ class StillImageActivity : BaseActivity(), LocationListener {
   }
   //TAG NEW ADDITION
   /** save data remote**/
-  fun save(rustData: RustData, dataService: DataService){
-    GlobalScope.launch (Dispatchers.IO){
+  fun save(rustData: RustData, dataService: DataService) {
+    GlobalScope.launch(Dispatchers.IO) {
       dataService.addDataAsync(rustData)
     }
   }
+
   /*** get current location***/
   @SuppressLint("MissingPermission")
-  fun getLocation(){
+  fun getLocation() {
     var locationManager: LocationManager =
       getSystemService(Context.LOCATION_SERVICE) as LocationManager
     locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0f, this)
   }
 
   override fun onLocationChanged(location: Location?) {
-    Log.d("dataa", location.toString())
-
+    Log.d("data", location.toString())
   }
-
 
   companion object {
 
@@ -275,6 +266,5 @@ class StillImageActivity : BaseActivity(), LocationListener {
 
     /** Request code for starting photo library activity  */
     private const val REQUEST_PHOTO_LIBRARY = 2
-
   }
 }
