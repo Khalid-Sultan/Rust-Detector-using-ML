@@ -156,15 +156,27 @@ class StillImageActivity : BaseActivity(), LocationListener {
             ignoreCase = true
           )
           Log.d("1", results.toString())
-          val finalResult =
+          var finalResult =
             "Source: ${results[1]}" +
-              "Latency: ${results[2]}" +
+              "Latency: ${results[2]}"
+          if(results.size==3){
+            finalResult += "Result: Could not detect it properly. Try Again."
+          }
+          else {
+            finalResult +=
               "Label: ${results[3]}" +
               "Confidence: ${results[4]}"
+          }
           textView?.text = finalResult
           val dataService = DataServiceGenerator().createDataService(this)
-          var rustData= RustData(0,0,results[1],results[2], results[3],results[4].toFloat())
-          save(rustData, dataService!!)
+          if(results.size==3){
+            var rustData= RustData(0,0,results[1],results[2], "Unknown",0.0f)
+            save(rustData, dataService!!)
+          }
+          else{
+            var rustData= RustData(0,0,results[1],results[2], results[3],results[4].toFloat())
+            save(rustData, dataService!!)
+          }
         }
       } else {
         val e = task.exception

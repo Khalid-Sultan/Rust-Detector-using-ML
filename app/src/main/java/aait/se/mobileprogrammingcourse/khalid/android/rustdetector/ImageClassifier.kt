@@ -130,6 +130,7 @@ internal constructor(context: Context) {
       else
         printTopKLabels(labelProbList)
 
+
       // print the results
       textToShow
     }
@@ -147,11 +148,15 @@ internal constructor(context: Context) {
 
   /** Prints top-K labels, to be shown in UI as the results.  */
   private val printTopKLabels: (List<FirebaseVisionImageLabel>) -> String = {
+
     it.joinToString(
             separator = "\n",
             limit = RESULTS_TO_SHOW
-    ) { label ->
+    ) {
+        label ->
       String.format(Locale.getDefault(), "Label: %s, Confidence: %4.2f", label.text, label.confidence)
+
+
     }
   }
 
