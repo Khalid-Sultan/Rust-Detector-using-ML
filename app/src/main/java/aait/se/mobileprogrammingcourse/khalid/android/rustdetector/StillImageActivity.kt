@@ -16,10 +16,15 @@
 
 package aait.se.mobileprogrammingcourse.khalid.android.rustdetector
 
+import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -31,12 +36,25 @@ import android.widget.TextView
 import androidx.core.content.FileProvider
 import com.google.firebase.ml.common.FirebaseMLException
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
+import kotlin.reflect.typeOf
 
-class StillImageActivity : BaseActivity() {
+class StillImageActivity : BaseActivity(), LocationListener {
+  override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
+
+  }
+
+  override fun onProviderEnabled(provider: String?) {
+  }
+
+  override fun onProviderDisabled(provider: String?) {
+  }
 
   private var currentPhotoFile: File? = null
   private var imagePreview: ImageView? = null
@@ -91,6 +109,7 @@ class StillImageActivity : BaseActivity() {
     }
   }
 
+  @SuppressLint("MissingSuperCall")
   override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
     if (resultCode != Activity.RESULT_OK) return
 
@@ -122,16 +141,37 @@ class StillImageActivity : BaseActivity() {
     imagePreview?.setImageBitmap(bitmap)
 
     // Classify image.
-    classifier?.classifyFrame(bitmap)?.
-      addOnCompleteListener { task ->
-        if (task.isSuccessful) {
-          textView?.text = task.result
+    classifier?.classifyFrame(bitmap)?.addOnCompleteListener { task ->
+      if (task.isSuccessful) {
+        var resultString: String? = task.result
+        if (resultString == null) {
+          textView?.text = "Failed to identify object. Please Try Again."
         } else {
-          val e = task.exception
-          Log.e(TAG, "Error classifying frame", e)
-          textView?.text = e?.message
+          resultString = resultString.replace(", ", "\n")
+          var results = resultString.split(
+            "Source: ",
+            "Latency: ",
+            "Label: ",
+            "Confidence: ",
+            ignoreCase = true
+          )
+          Log.d("1", results.toString())
+          val finalResult =
+            "Source: ${results[1]}" +
+              "Latency: ${results[2]}" +
+              "Label: ${results[3]}" +
+              "Confidence: ${results[4]}"
+          textView?.text = finalResult
+          val dataService = DataServiceGenerator().createDataService(this)
+          var rustData= RustData(0,0,results[1],results[2], results[3],results[4].toFloat())
+          save(rustData, dataService!!)
         }
+      } else {
+        val e = task.exception
+        Log.e(TAG, "Error classifying frame", e)
+        textView?.text = e?.message
       }
+    }
   }
 
   private fun chooseFromLibrary() {
@@ -189,6 +229,25 @@ class StillImageActivity : BaseActivity() {
 
     classifyImage(bitmap)
   }
+  //TAG NEW ADDITION
+  /** save data remote**/
+  fun save(rustData: RustData, dataService: DataService){
+    GlobalScope.launch (Dispatchers.IO){
+      dataService.addDataAsync(rustData)
+    }
+  }
+  /*** get current location***/
+  @SuppressLint("MissingPermission")
+  fun getLocation(){
+    var locationManager: LocationManager =
+      getSystemService(Context.LOCATION_SERVICE) as LocationManager
+    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0f, this)
+  }
+
+  override fun onLocationChanged(location: Location?) {
+
+  }
+
 
   companion object {
 

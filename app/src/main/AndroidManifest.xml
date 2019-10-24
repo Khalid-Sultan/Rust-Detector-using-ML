@@ -3,6 +3,7 @@
           xmlns:tools="http://schemas.android.com/tools"
           package="aait.se.mobileprogrammingcourse.khalid.android.rustdetector">
 
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA"/>
 
     <uses-feature android:name="android.hardware.camera"/>

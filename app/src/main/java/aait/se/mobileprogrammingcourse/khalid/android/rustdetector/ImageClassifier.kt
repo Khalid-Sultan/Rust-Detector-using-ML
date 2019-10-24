@@ -32,6 +32,9 @@ import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.label.FirebaseVisionImageLabel
 import com.google.firebase.ml.vision.label.FirebaseVisionImageLabeler
 import com.google.firebase.ml.vision.label.FirebaseVisionOnDeviceAutoMLImageLabelerOptions
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.Locale
 
@@ -151,6 +154,7 @@ internal constructor(context: Context) {
       String.format(Locale.getDefault(), "Label: %s, Confidence: %4.2f", label.text, label.confidence)
     }
   }
+
 
   companion object {
 
