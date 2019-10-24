@@ -43,7 +43,6 @@ import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
-import kotlin.reflect.typeOf
 
 class StillImageActivity : BaseActivity(), LocationListener {
   override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
@@ -59,6 +58,7 @@ class StillImageActivity : BaseActivity(), LocationListener {
   private var currentPhotoFile: File? = null
   private var imagePreview: ImageView? = null
   private var textView: TextView? = null
+  private var location = emptyArray<Double>()
 
   private var classifier: ImageClassifier? = null
   private var currentImageIndex = 0
@@ -158,8 +158,8 @@ class StillImageActivity : BaseActivity(), LocationListener {
           Log.d("1", results.toString())
           var finalResult =
             "Source: ${results[1]}" +
-              "Latency: ${results[2]}"
-          if(results.size==3){
+              "Latency: ${results[2].split("No Result")[0]}"
+          if(results[2].contains("No Result")){
             finalResult += "Result: Could not detect it properly. Try Again."
           }
           else {
@@ -169,12 +169,15 @@ class StillImageActivity : BaseActivity(), LocationListener {
           }
           textView?.text = finalResult
           val dataService = DataServiceGenerator().createDataService(this)
-          if(results.size==3){
-            var rustData= RustData(0,0,results[1],results[2], "Unknown",0.0f)
+          getLocation()
+
+
+          if(results[2].contains("No Result")){
+            var rustData= RustData(0.0,0.0,results[1],results[2].split("No Result")[0], "Unknown",0.0f)
             save(rustData, dataService!!)
           }
           else{
-            var rustData= RustData(0,0,results[1],results[2], results[3],results[4].toFloat())
+            var rustData= RustData(0.0,0.0,results[1],results[2], results[3],results[4].toFloat())
             save(rustData, dataService!!)
           }
         }
@@ -257,6 +260,7 @@ class StillImageActivity : BaseActivity(), LocationListener {
   }
 
   override fun onLocationChanged(location: Location?) {
+    Log.d("dataa", location.toString())
 
   }
 
