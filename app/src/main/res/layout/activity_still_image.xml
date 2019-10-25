@@ -1,69 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/relativeLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
-        android:id="@+id/header"
-        android:layout_width="match_parent"
+    <ImageButton
+        android:id="@+id/photo_camera_button"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:gravity="center_horizontal"
-        android:background="@color/light_background"
-        android:orientation="horizontal" >
-
-        <ImageButton
-            android:id="@+id/photo_library_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:background="@drawable/ic_photo_library"
-            android:backgroundTint="@color/control_background"
-        />
-
-        <ImageButton
-            android:id="@+id/photo_camera_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:background="@drawable/ic_photo_camera"
-            android:backgroundTint="@color/control_background"
-        />
-
-    </LinearLayout>
+        android:background="@drawable/ic_photo_camera"
+        android:backgroundTint="@color/control_background"
+        app:layout_constraintBottom_toTopOf="@+id/next_image_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <ImageView
         android:id="@+id/image_preview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/header"
-        android:layout_above="@id/next_image_button"/>
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
 
     <Button
         android:id="@+id/next_image_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@id/footer"
-        android:layout_centerHorizontal="true"
-        android:text="@string/next_image"/>
+        android:layout_marginBottom="40dp"
+        android:text="@string/next_image"
+        app:layout_constraintBottom_toBottomOf="@+id/image_preview"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent" />
 
-    <FrameLayout
-        android:id="@+id/footer"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/result_footer_height"
-        android:layout_alignParentBottom="true"
-        android:background="@color/control_background">
+    <TextView
+        android:id="@+id/result_text"
+        android:layout_width="411dp"
+        android:layout_height="152dp"
+        android:background="#C4111111"
+        android:fontFamily="sans-serif-condensed-light"
+        android:paddingLeft="@dimen/result_text_padding"
+        android:textColor="#FFF"
+        android:textSize="@dimen/text_size"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/image_preview" />
 
-        <TextView
-            android:id="@+id/result_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/result_text_padding"
-            android:textColor="#FFF"
-            android:textSize="@dimen/text_size"
-            android:fontFamily="sans-serif-condensed-light"
-            android:textStyle="bold"/>
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="580dp" />
 
-    </FrameLayout>
-
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

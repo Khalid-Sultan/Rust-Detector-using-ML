@@ -70,7 +70,8 @@ class StillImageActivity : BaseActivity(), LocationListener {
     imagePreview = findViewById(R.id.image_preview)
     textView = findViewById(R.id.result_text)
     findViewById<ImageButton>(R.id.photo_camera_button)?.setOnClickListener { takePhoto() }
-    findViewById<ImageButton>(R.id.photo_library_button)?.setOnClickListener { chooseFromLibrary() }
+    //findViewById<ImageButton>(R.id.photo_library_button)?.setOnClickListener { chooseFromLibrary
+      //() }
     findViewById<Button>(R.id.next_image_button)?.setOnClickListener { clickNextImage() }
 
     // Get list of bundled images.
