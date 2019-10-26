@@ -16,14 +16,15 @@
 
 package aait.se.mobileprogrammingcourse.khalid.android.rustdetector
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.location.Location
-import android.location.LocationListener
 import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
@@ -33,7 +34,9 @@ import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import com.google.android.gms.location.LocationServices
 import com.google.firebase.ml.common.FirebaseMLException
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import kotlinx.coroutines.Dispatchers
@@ -44,24 +47,18 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
 
-class StillImageActivity : BaseActivity(), LocationListener {
-  override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
-  }
-
-  override fun onProviderEnabled(provider: String?) {
-  }
-
-  override fun onProviderDisabled(provider: String?) {
-  }
+class StillImageActivity : BaseActivity() {
 
   private var currentPhotoFile: File? = null
   private var imagePreview: ImageView? = null
   private var textView: TextView? = null
-  private var location = emptyArray<Double>()
+  private var latitude = 0.0
+  private var longitude = 0.0
 
   private var classifier: ImageClassifier? = null
   private var currentImageIndex = 0
   private var bundledImageList: Array<String>? = null
+
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -76,6 +73,26 @@ class StillImageActivity : BaseActivity(), LocationListener {
 
     // Get list of bundled images.
     bundledImageList = resources.getStringArray(R.array.image_name_array)
+    var locationManager: LocationManager =
+      getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
+    if(ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION) ==
+      PackageManager
+        .PERMISSION_GRANTED
+      && ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_COARSE_LOCATION) ==
+      PackageManager
+        .PERMISSION_GRANTED)
+    {
+      var fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+      fusedLocationClient.lastLocation
+        .addOnSuccessListener { location: Location? -> run {
+          this.latitude = location!!.latitude
+          this.longitude = location!!.longitude
+        }
+
+        }
+    }
+
 
     // Setup image classifier.
     try {
@@ -164,10 +181,11 @@ class StillImageActivity : BaseActivity(), LocationListener {
 
           textView?.text = finalResult
           val dataService = DataServiceGenerator().createDataService(this)
-          getLocation()
+
 
           var rustData =
-            RustData(0.0, 0.0, results[1], results[2], results[3], results[4].toFloat())
+            RustData(this.latitude, this.longitude, results[1], results[2], results[3], results[4]
+              .toFloat())
           save(rustData, dataService!!)
         }
       } else {
@@ -245,17 +263,8 @@ class StillImageActivity : BaseActivity(), LocationListener {
     }
   }
 
-  /*** get current location***/
-  @SuppressLint("MissingPermission")
-  fun getLocation() {
-    var locationManager: LocationManager =
-      getSystemService(Context.LOCATION_SERVICE) as LocationManager
-    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0f, this)
-  }
 
-  override fun onLocationChanged(location: Location?) {
-    Log.d("data", location.toString())
-  }
+
 
   companion object {
 
